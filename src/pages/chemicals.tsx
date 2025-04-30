@@ -1,16 +1,32 @@
+// Chemicals.tsx
 import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import SearchBar from "@/components/SearchBar"
 import FilterBar from "@/components/FilterBar"
 import ChemicalCard from "@/components/ChemicalCard"
+import ChemicalDetailsModal from "@/components/ChemicalDetailsModal"
 import EmptyState from "@/components/EmptyState"
-import { LayoutGrid, Table } from "lucide-react"
+import { LayoutGrid, Table, Eye } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface Chemical {
+  id: string;
   name: string;
   formula: string;
+  formula_latex?: string;
   location: string;
   bottle_number: string;
+  synonyms?: string[];
+  msds_url?: string;
+  structure_2d_url?: string;
+  structure_3d_url?: string;
+  is_concentrated?: boolean;
+  shelf_id?: string;
+  shelf?: {
+    name: string;
+    location: string;
+    id: string;
+  };
 }
 
 function formatFormula(formula: string) {
@@ -40,6 +56,8 @@ export default function Home() {
   const [search, setSearch] = useState("")
   const [selectedLocation, setSelectedLocation] = useState("")
   const [viewMode, setViewMode] = useState("card")
+  const [selectedChemicalId, setSelectedChemicalId] = useState<string | null>(null)
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchChemicals = async () => {
@@ -72,6 +90,16 @@ export default function Home() {
   )
 
   const uniqueLocations = [...new Set(chemicals.map(c => c.location))]
+
+  const handleViewDetails = (chemicalId: string) => {
+    setSelectedChemicalId(chemicalId)
+    setIsDetailsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsDetailsModalOpen(false)
+    setSelectedChemicalId(null)
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -116,8 +144,12 @@ export default function Home() {
           <EmptyState />
         ) : viewMode === "card" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredChemicals.map((chemical, index) => (
-              <ChemicalCard key={index} chemical={chemical} />
+            {filteredChemicals.map((chemical) => (
+              <ChemicalCard 
+                key={chemical.id} 
+                chemical={chemical} 
+                onViewDetails={handleViewDetails}
+              />
             ))}
           </div>
         ) : (
@@ -128,16 +160,30 @@ export default function Home() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formula</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bottle Number</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredChemicals.map((chemical, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
+                {filteredChemicals.map((chemical) => (
+                  <tr key={chemical.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">{chemical.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{formatFormula(chemical.formula)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{chemical.location}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{chemical.shelf?.name || "N/A"}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{chemical.bottle_number}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                        onClick={() => handleViewDetails(chemical.id)}
+                      >
+                        <Eye size={16} className="mr-1" />
+                        Details
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -145,6 +191,15 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Centralized Chemical Details Modal */}
+      {selectedChemicalId && (
+        <ChemicalDetailsModal 
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseModal}
+          chemicalId={selectedChemicalId}
+        />
+      )}
     </div>
   );
-}  
+}
