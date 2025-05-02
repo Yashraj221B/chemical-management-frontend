@@ -19,16 +19,12 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      // This would be a real API call
-      // const response = await fetch('http://localhost:8000/admin/stats');
-      // const data = await response.json();
-      // setStats(data);
-      
-      // For demo purposes:
+      const response = await fetch('http://localhost:8000/chemicals/stats/');
+      const data = await response.json();
       setStats({
-        totalChemicals: 32,
-        totalShelves: 8,
-        alertsCount: 3
+        totalChemicals: data.totalChemicals,
+        totalShelves: data.totalShelves,
+        alertsCount: 0
       });
     } catch (error) {
       console.error("Failed to fetch stats:", error);

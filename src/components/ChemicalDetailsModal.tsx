@@ -31,7 +31,6 @@ interface ChemicalDetails {
   location: string;
   msds_url: string;
   structure_2d_url: string;
-  structure_3d_url: string;
   bottle_number: string;
   is_concentrated: boolean;
   shelf: {

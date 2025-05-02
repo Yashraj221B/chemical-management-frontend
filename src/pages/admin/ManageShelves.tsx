@@ -1,5 +1,6 @@
 // src/pages/admin/ManageShelves.tsx
 import { useState, useEffect } from "react";
+import axios from "axios";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,44 +10,48 @@ import { Plus, Edit, Trash2, Loader2, SaveAll, X, MapPin, Book } from "lucide-re
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
-// Define shelf type to match backend
+// Base URL for API calls
+const API_BASE_URL = "http://localhost:8000";
+const token = localStorage.getItem("token") || "";
+
+// Define shelf interface to match backend
 interface Shelf {
-  id?: number;
+  id?: string;
   name: string;
   location: string;
+  shelfInitial?: string;
   capacity?: number;
+  last_updated?: string;
+}
+
+// Interface for shelf with statistics
+interface ShelfWithStats extends Shelf {
   itemCount?: number;
-  lastUpdated?: string;
 }
 
 export default function ManageShelves() {
-  const [shelves, setShelves] = useState<Shelf[]>([]);
+  const [shelves, setShelves] = useState<ShelfWithStats[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingShelf, setEditingShelf] = useState<Shelf | null>(null);
-  const [newShelf, setNewShelf] = useState<Shelf>({ name: "", location: "" });
+  const [editingShelf, setEditingShelf] = useState<ShelfWithStats | null>(null);
+  const [newShelf, setNewShelf] = useState<Shelf>({ name: "", location: "", shelfInitial: "" });
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [shelfCounts, setShelfCounts] = useState<Record<string, number>>({});
+  const [totalChemicals, setTotalChemicals] = useState(0);
 
   useEffect(() => {
     fetchShelves();
+    fetchStatistics();
   }, []);
 
   const fetchShelves = async () => {
     setIsLoading(true);
     try {
-      // For demo:
-      const demoShelves: Shelf[] = [
-        { id: 1, name: "Shelf A", location: "Laboratory Room 101", capacity: 50, itemCount: 32, lastUpdated: "2023-11-15" },
-        { id: 2, name: "Shelf B", location: "Laboratory Room 101", capacity: 35, itemCount: 18, lastUpdated: "2023-11-20" },
-        { id: 3, name: "Concentrated Chemicals Shelf", location: "Secured Storage Room", capacity: 25, itemCount: 25, lastUpdated: "2023-11-22" },
-        { id: 4, name: "Shelf C", location: "Laboratory Room 102", capacity: 40, itemCount: 12, lastUpdated: "2023-11-18" },
-        { id: 5, name: "Fume Hood", location: "Laboratory Room 101", capacity: 15, itemCount: 8, lastUpdated: "2023-11-21" },
-        { id: 6, name: "Shelf D", location: "Storage Room", capacity: 60, itemCount: 45, lastUpdated: "2023-11-19" },
-        { id: 7, name: "Shelf E", location: "Laboratory Room 103", capacity: 30, itemCount: 7, lastUpdated: "2023-11-17" },
-      ];
-      setShelves(demoShelves);
+      const response = await axios.get(`${API_BASE_URL}/chemicals/shelves/`);
+      setShelves(response.data);
     } catch (err) {
       setError("Failed to fetch shelves");
       console.error(err);
@@ -54,6 +59,24 @@ export default function ManageShelves() {
       setIsLoading(false);
     }
   };
+
+  const fetchStatistics = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/chemicals/stats/`);
+      setShelfCounts(response.data.shelfwiseCount || {});
+      setTotalChemicals(response.data.totalChemicals || 0);
+    } catch (err) {
+      console.error("Failed to fetch statistics", err);
+    }
+  };
+
+  // Combine shelf data with statistics
+  const enrichedShelves = shelves.map(shelf => ({
+    ...shelf,
+    itemCount: shelfCounts[shelf.name] || 0,
+    // Default capacity if not provided
+    capacity: shelf.capacity || 50
+  }));
 
   const handleAddShelf = async () => {
     if (!newShelf.name || !newShelf.location) {
@@ -63,26 +86,30 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      // For demo:
-      const demoNewShelf = { 
-        ...newShelf, 
-        id: shelves.length + 1,
-        capacity: 50,
-        itemCount: 0,
-        lastUpdated: new Date().toISOString().split('T')[0]
-      };
-      setShelves([...shelves, demoNewShelf]);
-      setNewShelf({ name: "", location: "" });
+      await axios.post(`${API_BASE_URL}/chemicals/shelves/`, newShelf, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      toast.success("Shelf created successfully");
+      
+      setNewShelf({ name: "", location: "", shelfInitial: "" });
       setShowAddForm(false);
       setError("");
-    } catch (err) {
-      setError("Failed to add shelf");
+      
+      // Refresh data
+      await fetchShelves();
+      await fetchStatistics();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to add shelf");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStartEdit = (shelf: Shelf) => {
+  const handleStartEdit = (shelf: ShelfWithStats) => {
     setEditingShelf(shelf);
   };
 
@@ -98,34 +125,58 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      const updatedShelf = {
-        ...editingShelf,
-        lastUpdated: new Date().toISOString().split('T')[0]
-      };
+      // Create a copy without itemCount which is not part of the API model
+      const { id, itemCount, ...shelfData } = editingShelf;
       
-      const updatedShelves = shelves.map((shelf) =>
-        shelf.id === updatedShelf.id ? updatedShelf : shelf
-      );
-      setShelves(updatedShelves);
+      await axios.put(`${API_BASE_URL}/chemicals/shelves/${id}`, shelfData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      toast.success("Shelf updated successfully");
+      
       setEditingShelf(null);
       setError("");
-    } catch (err) {
-      setError("Failed to update shelf");
+      
+      // Refresh data
+      await fetchShelves();
+      await fetchStatistics();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Failed to update shelf");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeleteShelf = async (shelfId: number | undefined) => {
+  const handleDeleteShelf = async (shelfId: string | undefined) => {
     if (!shelfId) return;
+
+    // Check if shelf has chemicals
+    const shelf = enrichedShelves.find(s => s.id === shelfId);
+    if (shelf && shelf.itemCount && shelf.itemCount > 0) {
+      setDeleteError(`Cannot delete shelf '${shelf.name}' because it contains ${shelf.itemCount} chemicals. Move or delete those chemicals first.`);
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const updatedShelves = shelves.filter((shelf) => shelf.id !== shelfId);
-      setShelves(updatedShelves);
+      await axios.delete(`${API_BASE_URL}/chemicals/shelves/${shelfId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      toast.success("Shelf deleted successfully");
+      
       setDeleteError(null);
-    } catch (err) {
-      setDeleteError("Failed to delete shelf");
+      
+      // Refresh data
+      await fetchShelves();
+      await fetchStatistics();
+    } catch (err: any) {
+      setDeleteError(err.response?.data?.detail || "Failed to delete shelf");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -200,7 +251,7 @@ export default function ManageShelves() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <label htmlFor="shelfName" className="text-sm font-medium">Shelf Name</label>
                         <Input
@@ -219,6 +270,16 @@ export default function ManageShelves() {
                           onChange={(e) => setNewShelf({ ...newShelf, location: e.target.value })}
                         />
                       </div>
+                      <div className="space-y-2">
+                        <label htmlFor="shelfInitial" className="text-sm font-medium">Shelf Initial</label>
+                        <Input
+                          id="shelfInitial"
+                          placeholder="Enter shelf initial (e.g. 'A')"
+                          value={newShelf.shelfInitial}
+                          onChange={(e) => setNewShelf({ ...newShelf, shelfInitial: e.target.value })}
+                        />
+                        <p className="text-xs text-slate-500">Used for bottle numbering (e.g. 'A001')</p>
+                      </div>
                     </div>
                     <Button onClick={handleAddShelf} disabled={isLoading} size="lg" className="w-full md:w-auto">
                       {isLoading ? (
@@ -235,13 +296,13 @@ export default function ManageShelves() {
           )}
         </AnimatePresence>
 
-        {isLoading && !shelves.length ? (
+        {isLoading && !enrichedShelves.length ? (
           <div className="flex justify-center items-center py-16">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {shelves.map((shelf) => (
+            {enrichedShelves.map((shelf) => (
               <Card key={shelf.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 {editingShelf && editingShelf.id === shelf.id ? (
                   <div className="p-6 space-y-4">
@@ -260,6 +321,15 @@ export default function ManageShelves() {
                         value={editingShelf.location}
                         onChange={(e) => setEditingShelf({...editingShelf, location: e.target.value})}
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Shelf Initial</label>
+                      <Input
+                        placeholder="Shelf Initial (e.g. 'A')"
+                        value={editingShelf.shelfInitial || ''}
+                        onChange={(e) => setEditingShelf({...editingShelf, shelfInitial: e.target.value})}
+                      />
+                      <p className="text-xs text-slate-500">Used for bottle numbering</p>
                     </div>
                     <div className="flex space-x-2 pt-2">
                       <Button onClick={handleUpdateShelf} disabled={isLoading} className="flex-1">
@@ -280,7 +350,14 @@ export default function ManageShelves() {
                   <>
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-xl font-bold">{shelf.name}</CardTitle>
+                        <CardTitle className="text-xl font-bold">
+                          {shelf.name}
+                          {shelf.shelfInitial && (
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              {shelf.shelfInitial}
+                            </Badge>
+                          )}
+                        </CardTitle>
                         <Badge variant={shelf.itemCount === shelf.capacity ? "destructive" : "outline"}>
                           {shelf.itemCount === shelf.capacity ? "Full" : "Active"}
                         </Badge>
@@ -295,7 +372,7 @@ export default function ManageShelves() {
                       <div className="space-y-4 mt-4">
                         <div>
                           <div className="flex justify-between text-sm mb-1">
-                            <span>Storage Capacity</span>
+                            <span>Storage Usage</span>
                             <span className="font-medium">{shelf.itemCount} / {shelf.capacity}</span>
                           </div>
                           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -312,7 +389,7 @@ export default function ManageShelves() {
                             <Book className="h-3.5 w-3.5" />
                             <span>Last updated:</span>
                           </div>
-                          <span>{shelf.lastUpdated}</span>
+                          <span>{new Date(shelf.last_updated || '').toLocaleDateString()}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -330,7 +407,7 @@ export default function ManageShelves() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteShelf(shelf.id)}
-                        disabled={isLoading}
+                        disabled={isLoading || !!(shelf.itemCount && shelf.itemCount > 0)}
                         className="text-red-500 hover:text-red-600 hover:bg-red-50"
                       >
                         {isLoading ? (
@@ -348,7 +425,7 @@ export default function ManageShelves() {
           </div>
         )}
 
-        {!isLoading && shelves.length === 0 && (
+        {!isLoading && enrichedShelves.length === 0 && (
           <div className="text-center p-12 bg-white rounded-lg border border-dashed">
             <h3 className="text-lg font-medium text-slate-600 mb-2">No shelves found</h3>
             <p className="text-slate-500 mb-4">

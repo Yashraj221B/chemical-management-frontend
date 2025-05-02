@@ -19,7 +19,6 @@ interface Chemical {
   synonyms?: string[];
   msds_url?: string;
   structure_2d_url?: string;
-  structure_3d_url?: string;
   is_concentrated?: boolean;
   shelf_id?: string;
   shelf?: {
