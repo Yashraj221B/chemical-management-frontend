@@ -1,8 +1,8 @@
+// ChemicalCard.tsx
 "use client"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Hash } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import { formatFormula } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface ChemicalCardProps {
   chemical: { 
@@ -13,6 +13,26 @@ interface ChemicalCardProps {
     id: string
   };
   onViewDetails: (chemicalId: string) => void;
+}
+
+function formatFormula(formula: string) {
+  return formula.split("").map((char, index) => {
+    if (!isNaN(Number(char))) {
+      return (
+        <sub key={index} className="text-xs">
+          {char}
+        </sub>
+      )
+    }
+    if (char === "+") {
+      return (
+        <sup key={index} className="text-xs">
+          {char}
+        </sup>
+      )
+    }
+    return char
+  })
 }
 
 export default function ChemicalCard({ chemical, onViewDetails }: ChemicalCardProps) {

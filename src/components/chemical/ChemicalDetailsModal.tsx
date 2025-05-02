@@ -7,10 +7,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/Dialog";
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertCircle,
   Beaker,
@@ -20,8 +20,7 @@ import {
   Info,
   MapPin,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/Alert";
-import { formatFormula } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ChemicalDetails {
   name: string;
@@ -52,7 +51,23 @@ interface ChemicalDetailsModalProps {
 function FormulaDisplay({ formula }: { formula: string }) {
   return (
     <>
-      {formatFormula(formula)}
+      {formula.split("").map((char, index) => {
+        if (!isNaN(Number(char))) {
+          return (
+            <sub key={index} className="text-xs">
+              {char}
+            </sub>
+          );
+        }
+        if (char === "+") {
+          return (
+            <sup key={index} className="text-xs">
+              {char}
+            </sup>
+          );
+        }
+        return char;
+      })}
     </>
   );
 }
