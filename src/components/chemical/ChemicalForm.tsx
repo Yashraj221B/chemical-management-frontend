@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Select, Checkbox, Button } from '@/components/ui';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 
 interface ChemicalFormProps {
   initialData?: {
@@ -96,16 +99,16 @@ const ChemicalForm: React.FC<ChemicalFormProps> = ({
             value={formData.shelf_id}
             onValueChange={(value) => handleInputChange('shelf_id', value)}
           >
-            <Select.Trigger>
-              <Select.Value placeholder="Select a shelf" />
-            </Select.Trigger>
-            <Select.Content>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a shelf" />
+            </SelectTrigger>
+            <SelectContent>
               {shelves.map((shelf) => (
-                <Select.Item key={shelf.id} value={shelf.id}>
+                <SelectItem key={shelf.id} value={shelf.id}>
                   {shelf.name} ({shelf.location || ''})
-                </Select.Item>
+                </SelectItem>
               ))}
-            </Select.Content>
+            </SelectContent>
           </Select>
         </div>
 

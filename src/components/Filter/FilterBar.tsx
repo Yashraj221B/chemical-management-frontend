@@ -1,5 +1,5 @@
 "use client"
-import { Badge } from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 export default function FilterBar({ uniqueLocations, handleFilter }: { uniqueLocations: string[], handleFilter: (location: string) => void }) {
   return (

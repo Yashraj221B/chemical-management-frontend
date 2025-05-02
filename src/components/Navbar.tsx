@@ -1,8 +1,8 @@
 // src/components/Navbar.tsx
 "use client"
 import { Beaker, ChevronDown, Menu, X, Layers } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import { Avatar, AvatarFallback } from "@/components/ui/Avatar"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
