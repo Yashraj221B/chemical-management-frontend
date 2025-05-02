@@ -7,10 +7,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import {
   AlertCircle,
   Beaker,
@@ -20,7 +20,7 @@ import {
   Info,
   MapPin,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { formatFormula } from "@/lib/utils";
 
 interface ChemicalDetails {

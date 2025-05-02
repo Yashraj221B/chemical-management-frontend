@@ -1,7 +1,7 @@
 "use client"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/Card"
 import { MapPin, Hash } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { formatFormula } from "@/lib/utils"
 
 interface ChemicalCardProps {

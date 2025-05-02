@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Chemicals from "./pages/chemicals";
 import Login from "./pages/login";
 import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/Protected/ProtectedRoute";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ManageShelves from "./pages/admin/ManageShelves";
 import ManageChemicals from "./pages/admin/ManageChemicals";

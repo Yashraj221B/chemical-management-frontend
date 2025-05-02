@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/Dialog";
 import {
   Plus,
   Edit,
@@ -33,12 +33,12 @@ import {
   Download,
   AlertCircle,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/Alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import ChemicalStructureViewer from "@/components/ChemicalModal";
-import { formatFormula, fetchFromPubChem, getCompoundDataByCID } from "@/lib/utils";
+import ChemicalStructureViewer from "@/components/ChemicalStructureViewer";
+import { formatFormula, fetchFromPubChem, getCompoundDataByCID, formatFormulaLatex } from "@/lib/utils";
 
 // Define the API base URL
 const API_BASE_URL = "http://localhost:8000/chemicals";

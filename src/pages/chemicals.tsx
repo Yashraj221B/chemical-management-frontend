@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import Navbar from "@/components/Navbar/Navbar"
+import Navbar from "@/components/Navbar"
 import SearchBar from "@/components/Search/SearchBar"
 import FilterBar from "@/components/Filter/FilterBar"
 import ChemicalCard from "@/components/ChemicalCard"
 import ChemicalDetailsModal from "@/components/ChemicalDetailsModal"
 import EmptyState from "@/components/Empty/EmptyState"
 import { LayoutGrid, Table, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 
 interface Chemical {
   id: string;
