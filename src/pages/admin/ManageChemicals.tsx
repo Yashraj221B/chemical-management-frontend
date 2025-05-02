@@ -38,7 +38,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ChemicalStructureViewer from "@/components/ChemicalModal";
-import { formatFormulaLatex } from "@/lib/utils";
+import { formatFormula, fetchFromPubChem, getCompoundDataByCID } from "@/lib/utils";
 
 // Define the API base URL
 const API_BASE_URL = "http://localhost:8000/chemicals";
@@ -76,26 +76,6 @@ interface PubChemResult {
   formula?: string;
   synonyms?: string[];
   structure_url?: string;
-}
-
-function formatFormula(formula: string) {
-  return formula.split("").map((char, index) => {
-    if (!isNaN(Number(char))) {
-      return (
-        <sub key={index} className="text-xs">
-          {char}
-        </sub>
-      );
-    }
-    if (char === "+") {
-      return (
-        <sup key={index} className="text-xs">
-          {char}
-        </sup>
-      );
-    }
-    return char;
-  });
 }
 
 export default function ManageChemicals() {
@@ -205,92 +185,6 @@ export default function ManageChemicals() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const fetchFromPubChem = async (query: string) => {
-    setIsPubChemLoading(true);
-    setPubChemError(null);
-    
-    try {
-      // Try direct match by name first
-      const nameSearchUrl = `${PUBCHEM_API_URL}/compound/name/${encodeURIComponent(query)}/cids/JSON`;
-      const response = await fetch(nameSearchUrl);
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.IdentifierList && data.IdentifierList.CID && data.IdentifierList.CID.length > 0) {
-          const cid = data.IdentifierList.CID[0];
-          return await getCompoundDataByCID(cid, query);
-        }
-      }
-      
-      // If direct match fails, try autocomplete suggestions
-      const autocompleteUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete/compound/${encodeURIComponent(query)}/json`;
-      const autocompleteResponse = await fetch(autocompleteUrl);
-      
-      if (!autocompleteResponse.ok) {
-        throw new Error("PubChem search failed");
-      }
-      
-      const autocompleteData = await autocompleteResponse.json();
-      
-      if (!autocompleteData.dictionary_terms || !autocompleteData.dictionary_terms.compound || autocompleteData.dictionary_terms.compound.length === 0) {
-        throw new Error("No suggestions found for this chemical");
-      }
-      
-      // Try each suggestion in order (limit to first 5)
-      const suggestions = autocompleteData.dictionary_terms.compound.slice(0, 5);
-      
-      for (const suggestion of suggestions) {
-        const suggestionUrl = `${PUBCHEM_API_URL}/compound/name/${encodeURIComponent(suggestion)}/cids/JSON`;
-        const suggestionResponse = await fetch(suggestionUrl);
-        
-        if (suggestionResponse.ok) {
-          const data = await suggestionResponse.json();
-          if (data.IdentifierList && data.IdentifierList.CID && data.IdentifierList.CID.length > 0) {
-            const cid = data.IdentifierList.CID[0];
-            return await getCompoundDataByCID(cid, suggestion);
-          }
-        }
-      }
-      
-      // If we get here, no matches were found
-      throw new Error("No matches found in PubChem");
-    } catch (err) {
-      setPubChemError(err instanceof Error ? err.message : "Failed to fetch data from PubChem");
-      return null;
-    } finally {
-      setIsPubChemLoading(false);
-    }
-  };
-  
-  // Helper function to get compound data once we have a CID
-  const getCompoundDataByCID = async (cid: number, matchedName: string): Promise<PubChemResult | null> => {
-    try {
-      // Get properties
-      const propsUrl = `${PUBCHEM_API_URL}/compound/cid/${cid}/property/MolecularFormula,IUPACName,Synonyms/JSON`;
-      const propsResponse = await fetch(propsUrl);
-      
-      if (!propsResponse.ok) {
-        throw new Error("Failed to fetch compound properties");
-      }
-      
-      const propsData = await propsResponse.json();
-      const properties = propsData.PropertyTable.Properties[0];
-      
-      // Get structure URL
-      const structureUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG`;
-      
-      return {
-        name: properties.IUPACName || matchedName,
-        formula: properties.MolecularFormula || "",
-        synonyms: properties.Synonyms ? properties.Synonyms.slice(0, 10) : [],
-        structure_url: structureUrl,
-      };
-    } catch (err) {
-      console.error("Error processing PubChem data:", err);
-      return null;
-    }
-  };  
-  
   const populateFromPubChem = async () => {
     const query = formData.name || formData.formula;
     if (!query) {

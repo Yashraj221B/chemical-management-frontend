@@ -21,6 +21,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { formatFormula } from "@/lib/utils";
 
 interface ChemicalDetails {
   name: string;
@@ -51,23 +52,7 @@ interface ChemicalDetailsModalProps {
 function FormulaDisplay({ formula }: { formula: string }) {
   return (
     <>
-      {formula.split("").map((char, index) => {
-        if (!isNaN(Number(char))) {
-          return (
-            <sub key={index} className="text-xs">
-              {char}
-            </sub>
-          );
-        }
-        if (char === "+") {
-          return (
-            <sup key={index} className="text-xs">
-              {char}
-            </sup>
-          );
-        }
-        return char;
-      })}
+      {formatFormula(formula)}
     </>
   );
 }

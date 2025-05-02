@@ -1,7 +1,6 @@
-// src/pages/admin/Dashboard.tsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Beaker, Layers, AlertTriangle, Database, Users } from "lucide-react";
 
