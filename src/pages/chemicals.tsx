@@ -7,6 +7,7 @@ import ChemicalDetailsModal from "@/components/chemical/ChemicalDetailsModal"
 import EmptyState from "@/components/Empty/EmptyState"
 import { LayoutGrid, Table, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import ChemicalTable from "@/components/chemical/ChemicalTable"
 
 interface Chemical {
   id: string;
@@ -151,42 +152,11 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Formula</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bottle Number</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredChemicals.map((chemical) => (
-                  <tr key={chemical.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">{chemical.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{formatFormula(chemical.formula)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{chemical.location}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{chemical.shelf?.name || "N/A"}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{chemical.bottle_number}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                        onClick={() => handleViewDetails(chemical.id)}
-                      >
-                        <Eye size={16} className="mr-1" />
-                        Details
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ChemicalTable
+            chemicals={filteredChemicals}
+            onEdit={handleViewDetails}
+            onDelete={() => {}}
+          />
         )}
       </div>
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Beaker, Layers, AlertTriangle, Database, Users } from "lucide-react";
+import ChemicalCard from "@/components/chemical/ChemicalCard"; // P0b18
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({

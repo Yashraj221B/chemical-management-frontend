@@ -44,6 +44,8 @@ import ChemicalDetailsModal from "@/components/chemical/ChemicalDetailsModal";
 import ChemicalModal from "@/components/chemical/ChemicalModal";
 import FilterBar from "@/components/chemical/FilterBar";
 import SearchBar from "@/components/chemical/SearchBar";
+import ChemicalTable from "@/components/chemical/ChemicalTable"; // Pfa08
+import EmptyState from "@/components/Empty/EmptyState"; // P4e63
 
 // Define the API base URL
 const API_BASE_URL = "http://localhost:8000/chemicals";
@@ -608,167 +610,13 @@ export default function ManageChemicals() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : processedChemicals.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th
-                        className="px-4 py-3 text-left text-xs font-semibold cursor-pointer"
-                        onClick={() => handleSort("name")}
-                      >
-                        <div className="flex items-center">
-                          Name
-                          {sortField === "name" && (
-                            <ChevronsUpDown
-                              className={`ml-1 h-3 w-3 ${
-                                sortDirection === "asc" ? "rotate-180" : ""
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </th>
-                      <th
-                        className="px-4 py-3 text-left text-xs font-semibold cursor-pointer"
-                        onClick={() => handleSort("formula")}
-                      >
-                        <div className="flex items-center">
-                          Formula
-                          {sortField === "formula" && (
-                            <ChevronsUpDown
-                              className={`ml-1 h-3 w-3 ${
-                                sortDirection === "asc" ? "rotate-180" : ""
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </th>
-                      <th
-                        className="px-4 py-3 text-left text-xs font-semibold cursor-pointer"
-                        onClick={() => handleSort("shelf")}
-                      >
-                        <div className="flex items-center">
-                          Shelf
-                          {sortField === "shelf" && (
-                            <ChevronsUpDown
-                              className={`ml-1 h-3 w-3 ${
-                                sortDirection === "asc" ? "rotate-180" : ""
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </th>
-                      <th
-                        className="px-4 py-3 text-left text-xs font-semibold cursor-pointer"
-                        onClick={() => handleSort("bottle_number")}
-                      >
-                        <div className="flex items-center">
-                          Bottle #
-                          {sortField === "bottle_number" && (
-                            <ChevronsUpDown
-                              className={`ml-1 h-3 w-3 ${
-                                sortDirection === "asc" ? "rotate-180" : ""
-                              }`}
-                            />
-                          )}
-                        </div>
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {processedChemicals.map((chemical) => (
-                      <tr
-                        key={chemical.id}
-                        className="border-b hover:bg-gray-50"
-                      >
-                        <td className="px-4 py-3">
-                          <div className="font-medium">{chemical.name}</div>
-                          {chemical.synonyms && chemical.synonyms.length > 0 && (
-                            <div className="text-xs text-gray-500 truncate max-w-xs">
-                              {chemical.synonyms.slice(0, 3).join(", ")}
-                              {chemical.synonyms.length > 3 && " ..."}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap font-mono">
-                          {formatFormula(chemical.formula)}
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span>
-                              {chemical.shelf?.name ||
-                                shelves.find(
-                                  (shelf) => shelf.id === chemical.shelf_id
-                                )?.name ||
-                                "Unknown"}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {chemical.shelf?.location || 
-                                shelves.find(
-                                  (shelf) => shelf.id === chemical.shelf_id
-                                )?.location || 
-                                ""}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          {chemical.bottle_number}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-2">
-                            {chemical.structure_2d_url && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => openStructureViewer(chemical)}
-                              >
-                                <Microscope className="h-3 w-3 mr-1" />
-                                Structure
-                              </Button>
-                            )}
-                            {chemical.msds_url && (
-                              <Button variant="outline" size="sm" asChild>
-                                <a
-                                  href={chemical.msds_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <FileText className="h-3 w-3 mr-1" />
-                                  MSDS
-                                </a>
-                              </Button>
-                            )}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEdit(chemical)}
-                            >
-                              <Edit className="h-3 w-3 mr-1" />
-                              Edit
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDelete(chemical.id)}
-                              disabled={actionInProgress}
-                            >
-                              <Trash2 className="h-3 w-3 mr-1 text-red-500" />
-                              Delete
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ChemicalTable
+                chemicals={processedChemicals}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              /> // Pc049
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Cylinder className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                <p>No chemicals found matching your criteria</p>
-              </div>
+              <EmptyState /> // P5a93
             )}
           </CardContent>
         </Card>

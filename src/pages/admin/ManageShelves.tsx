@@ -1,4 +1,3 @@
-// src/pages/admin/ManageShelves.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "@/components/Navbar";
@@ -11,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import ChemicalCard from "@/components/chemical/ChemicalCard";
 
 // Base URL for API calls
 const API_BASE_URL = "http://localhost:8000";
