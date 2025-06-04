@@ -12,7 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserData = async (token: string) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/me`, {
+      const response = await fetch(`${VITE_BACKEND_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

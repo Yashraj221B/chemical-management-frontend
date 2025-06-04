@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 const token = localStorage.getItem("token") || "";
 console.log("Token:", token);
 
@@ -50,7 +50,7 @@ export default function ManageShelves() {
   const fetchShelves = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${BACKEND_URL}/chemicals/shelves/`, {
+      const response = await axios.get(`${VITE_BACKEND_URL}/chemicals/shelves/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ export default function ManageShelves() {
 
   const fetchStatistics = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/chemicals/stats/`);
+      const response = await axios.get(`${VITE_BACKEND_URL}/chemicals/stats/`);
       setShelfCounts(response.data.shelfwiseCount || {});
       setTotalChemicals(response.data.totalChemicals || 0);
     } catch (err) {
@@ -90,7 +90,7 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      await axios.post(`${BACKEND_URL}/chemicals/shelves/`, newShelf, {
+      await axios.post(`${VITE_BACKEND_URL}/chemicals/shelves/`, newShelf, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -132,7 +132,7 @@ export default function ManageShelves() {
       // Create a copy without itemCount which is not part of the API model
       const { id, itemCount, ...shelfData } = editingShelf;
       
-      await axios.put(`${BACKEND_URL}/chemicals/shelves/${id}`, shelfData, {
+      await axios.put(`${VITE_BACKEND_URL}/chemicals/shelves/${id}`, shelfData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -166,7 +166,7 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      await axios.delete(`${BACKEND_URL}/chemicals/shelves/${shelfId}`, {
+      await axios.delete(`${VITE_BACKEND_URL}/chemicals/shelves/${shelfId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

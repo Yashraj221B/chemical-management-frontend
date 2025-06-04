@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Beaker, Layers, AlertTriangle, Database, Users } from "lucide-react";
 
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -21,7 +21,7 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/chemicals/stats/`);
+      const response = await fetch(`${VITE_BACKEND_URL}/chemicals/stats/`);
       const data = await response.json();
       setStats({
         totalChemicals: data.totalChemicals,
