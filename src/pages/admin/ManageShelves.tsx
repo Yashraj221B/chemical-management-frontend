@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chemical-management-backend.azurewebsites.net";
 const token = localStorage.getItem("token") || "";
 console.log("Token:", token);
 

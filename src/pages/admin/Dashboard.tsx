@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Beaker, Layers, AlertTriangle, Database, Users } from "lucide-react";
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chemical-management-backend.azurewebsites.net";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({

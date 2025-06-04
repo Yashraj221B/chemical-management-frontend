@@ -9,7 +9,7 @@ import EmptyState from "@/components/EmptyState"
 import { LayoutGrid, Table, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chemical-management-backend.azurewebsites.net";
 
 interface Chemical {
   id: string;

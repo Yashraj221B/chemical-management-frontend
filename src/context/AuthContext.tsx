@@ -12,7 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
-const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chemical-management-backend.azurewebsites.net";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
