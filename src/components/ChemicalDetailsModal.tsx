@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+
 interface ChemicalDetails {
   name: string;
   shelf_id: string;
@@ -205,7 +207,7 @@ export default function ChemicalDetailsModal({
 
           // Replace with your actual API endpoint
           const response = await fetch(
-            `http://localhost:8000/chemicals/${chemicalId}`
+            `${BACKEND_URL}/chemicals/${chemicalId}`
           );
 
           if (!response.ok) {

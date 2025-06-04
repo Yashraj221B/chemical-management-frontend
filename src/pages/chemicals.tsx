@@ -9,6 +9,8 @@ import EmptyState from "@/components/EmptyState"
 import { LayoutGrid, Table, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+
 interface Chemical {
   id: string;
   name: string;
@@ -62,8 +64,8 @@ export default function Home() {
     const fetchChemicals = async () => {
       try {
         setLoading(true)
-        const response = await fetch('http://localhost:8000/chemicals/')
-        
+        const response = await fetch(`${BACKEND_URL}/chemicals/`)
+
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`)
         }

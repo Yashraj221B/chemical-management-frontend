@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Beaker, Layers, AlertTriangle, Database, Users } from "lucide-react";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalChemicals: 0,
@@ -19,7 +21,7 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/chemicals/stats/');
+      const response = await fetch(`${BACKEND_URL}/chemicals/stats/`);
       const data = await response.json();
       setStats({
         totalChemicals: data.totalChemicals,
@@ -106,11 +108,11 @@ export default function AdminDashboard() {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Link to="/admin/chemicals/new" className="flex items-center text-blue-600 hover:text-blue-800">
+              <Link to="/admin/chemicals" className="flex items-center text-blue-600 hover:text-blue-800">
                 <Beaker className="h-5 w-5 mr-2" />
                 Add New Chemical
               </Link>
-              <Link to="/admin/shelves/new" className="flex items-center text-blue-600 hover:text-blue-800">
+              <Link to="/admin/shelves" className="flex items-center text-blue-600 hover:text-blue-800">
                 <Layers className="h-5 w-5 mr-2" />
                 Add New Shelf
               </Link>

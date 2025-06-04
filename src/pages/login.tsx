@@ -10,6 +10,8 @@ import { AlertTriangle, Lock, Loader2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
+
 interface LocationState {
   from?: {
     pathname: string;
@@ -39,7 +41,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch(`${BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

@@ -12,9 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-// Base URL for API calls
-const API_BASE_URL = "http://localhost:8000";
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
 const token = localStorage.getItem("token") || "";
+console.log("Token:", token);
 
 // Define shelf interface to match backend
 interface Shelf {
@@ -40,7 +40,7 @@ export default function ManageShelves() {
   const [newShelf, setNewShelf] = useState<Shelf>({ name: "", location: "", shelfInitial: "" });
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [shelfCounts, setShelfCounts] = useState<Record<string, number>>({});
-  const [totalChemicals, setTotalChemicals] = useState(0);
+  const [, setTotalChemicals] = useState(0);
 
   useEffect(() => {
     fetchShelves();
@@ -50,7 +50,11 @@ export default function ManageShelves() {
   const fetchShelves = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/chemicals/shelves/`);
+      const response = await axios.get(`${BACKEND_URL}/chemicals/shelves/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setShelves(response.data);
     } catch (err) {
       setError("Failed to fetch shelves");
@@ -62,7 +66,7 @@ export default function ManageShelves() {
 
   const fetchStatistics = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/chemicals/stats/`);
+      const response = await axios.get(`${BACKEND_URL}/chemicals/stats/`);
       setShelfCounts(response.data.shelfwiseCount || {});
       setTotalChemicals(response.data.totalChemicals || 0);
     } catch (err) {
@@ -86,7 +90,7 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/chemicals/shelves/`, newShelf, {
+      await axios.post(`${BACKEND_URL}/chemicals/shelves/`, newShelf, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -128,7 +132,7 @@ export default function ManageShelves() {
       // Create a copy without itemCount which is not part of the API model
       const { id, itemCount, ...shelfData } = editingShelf;
       
-      await axios.put(`${API_BASE_URL}/chemicals/shelves/${id}`, shelfData, {
+      await axios.put(`${BACKEND_URL}/chemicals/shelves/${id}`, shelfData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -162,7 +166,7 @@ export default function ManageShelves() {
 
     setIsLoading(true);
     try {
-      await axios.delete(`${API_BASE_URL}/chemicals/shelves/${shelfId}`, {
+      await axios.delete(`${BACKEND_URL}/chemicals/shelves/${shelfId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
