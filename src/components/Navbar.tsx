@@ -31,7 +31,7 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center space-x-6">
-          <Link to="/chemicals" className="text-blue-600 font-medium">Chemicals</Link>
+          <Link to="/" className="text-blue-600 font-medium">Chemicals</Link>
           
           {isAuthenticated && (
             <div className="relative">

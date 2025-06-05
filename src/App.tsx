@@ -8,8 +8,14 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import ManageShelves from "./pages/admin/ManageShelves";
 import ManageChemicals from "./pages/admin/ManageChemicals";
 import NotFoundPage from "./pages/404";
+import { useEffect } from "react";
 
 function App() {
+
+  useEffect(() => {
+    document.title = "ChemTrack - Chemical Management System";
+  }, []);
+
   return (
     <AuthProvider>
       <Router>

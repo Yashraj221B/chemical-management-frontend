@@ -86,7 +86,9 @@ export default function Home() {
 
   const filteredChemicals = chemicals.filter((chemical) =>
     (chemical.name.toLowerCase().includes(search.toLowerCase()) ||
-     chemical.formula.toLowerCase().includes(search.toLowerCase())) &&
+     chemical.formula.toLowerCase().includes(search.toLowerCase()) ||
+     chemical.bottle_number.toLowerCase().includes(search.toLowerCase())
+    ) &&
     (selectedLocation ? chemical.location === selectedLocation : true)
   )
 
@@ -154,7 +156,7 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow">
+          <div className="bg-white rounded-lg shadow  ">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
