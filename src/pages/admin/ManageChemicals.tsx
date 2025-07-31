@@ -41,7 +41,7 @@ import ChemicalStructureViewer from "@/components/ChemicalModal";
 import { formatFormulaLatex } from "@/lib/utils";
 
 // Define the API base URL
-const API_BASE_URL = "https://chemical-management-backend.azurewebsites.net/chemicals";
+const API_BASE_URL = "https://chemical-management-backend.azurewebsites.net/chemicals/";
 const PUBCHEM_API_URL = "https://pubchem.ncbi.nlm.nih.gov/rest/pug";
 
 // Define interfaces for type safety
